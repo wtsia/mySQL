@@ -1,4 +1,4 @@
 # mySQL
-Collection of mySQL scripts/notes
+Collection of mySQL practice scripts/notes
 
 > Version: 8.0.32 MySQL Community Server
