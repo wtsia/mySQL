@@ -1,52 +1,74 @@
-DELIMITER $$
-DROP PROCEDURE IF EXISTS get_max_score$$
-DROP PROCEDURE IF EXISTS get_avg_score$$
-DROP PROCEDURE IF EXISTS get_avg_score$$
-DROP PROCEDURE IF EXISTS get_student_category$$
+/*
+Continue with creating database functions.
+1. Write a database function that will take a student_id as input and then return the Max(score) for the student.
+2. Write a database function that takes student_id as input and then returns the Avg(score) for the student.
+3. Write a database function that takes student_id as input and then returns Sum(score) for the student.
+4. Write a database function that takes student_id as input then goes and find out the Maximum event_id that this student has. Once we have this event_id found then go and return the Category of this student belong to from grade_event.
 
-
-CREATE PROCEDURE get_max_score(IN student_id INT, OUT max_score INT)
+Run all these database functions, capture the outputs as screenshot and submit the source code of the functions you have written including the screenshot.
+*/
+DELIMITER //
+CREATE FUNCTION GetMaxScore(student_id INT) RETURNS INT
 BEGIN
-    SELECT MAX(SCORE) INTO max_score FROM score WHERE STUDENT_ID = student_id;
-END$$
+    DECLARE max_score INT;
+    SELECT MAX(SCORE) INTO max_score FROM SCORE WHERE STUDENT_ID = student_id;
+    RETURN max_score;
+END //
 
-CREATE PROCEDURE get_avg_score(IN student_id INT, OUT avg_score FLOAT)
+CREATE FUNCTION GetAvgScore(student_id INT) RETURNS DECIMAL(10,2)
 BEGIN
-    SELECT AVG(SCORE) INTO avg_score FROM score WHERE STUDENT_ID = student_id;
-END$$
+    DECLARE avg_score DECIMAL(10,2);
+    SELECT AVG(score) INTO avg_score FROM SCORE WHERE STUDENT_ID = student_id;
+    RETURN avg_score;
+END //
 
-CREATE PROCEDURE get_sum_score(IN student_id INT, OUT sum_score INT)
+CREATE FUNCTION GetSumOfScore(student_id INT) RETURNS INT
 BEGIN
-    SELECT SUM(SCORE) INTO sum_score FROM score WHERE STUDENT_ID = student_id;
-END$$
+    DECLARE sum_scores INT;
+    SELECT SUM(score) INTO sum_scores FROM SCORE WHERE STUDENT_ID = student_id;
+    RETURN sum_scores;
+END //
 
-CREATE PROCEDURE get_student_category(IN student_id INT, OUT student_category enum('T','Q'))
+CREATE FUNCTION GetMaxEventID(student_id INT) RETURNS VARCHAR(50)
 BEGIN
-    SELECT MAX(EVENT_ID) INTO @max_event_id FROM score WHERE STUDENT_ID = student_id;
-    SELECT CATEGORY INTO student_category FROM grade_event WHERE EVENT_ID = @max_event_id;
-END$$
+    DECLARE max_event_id INT;
+    DECLARE category_out VARCHAR(50);
+    SELECT MAX(event_id) INTO max_event_id FROM SCORE WHERE STUDENT_ID = student_id;
+    SELECT CATEGORY INTO category_out FROM GRADE_EVENT WHERE EVENT_ID = max_event_id;
+    RETURN category_out;
+END //
 DELIMITER ;
 
 /*
-****FUNCTION****
-CALL get_max_score(1, @max_score);
-SELECT @max_score;
-****TEST****
-SELECT MAX(SCORE) FROM score WHERE STUDENT_ID = 1;
+mysql> SELECT GetMaxScore(1);
++----------------+
+| GetMaxScore(1) |
++----------------+
+|            100 |
++----------------+
+1 row in set (0.01 sec)
 
-****FUNCTION****
-CALL get_avg_score(1, @avg_score);
-SELECT @avg_score;
-****TEST****
-SELECT AVG(SCORE) FROM score WHERE STUDENT_ID = 1;
+mysql> SELECT GetAvgScore(1);
++----------------+
+| GetAvgScore(1) |
++----------------+
+|          36.90 |
++----------------+
+1 row in set (0.00 sec)
 
-****FUNCTION****
-CALL get_sum_score(1, @sum_score);
-SELECT @sum_score;
-****TEST****
-SELECT SUM(SCORE) FROM score WHERE STUDENT_ID = 1;
+mysql> SELECT GetSumOfScore(1);
++------------------+
+| GetSumOfScore(1) |
++------------------+
+|             6458 |
++------------------+
+1 row in set (0.00 sec)
 
-****FUNCTION****
-CALL get_student_category(1, @student_category);
-SELECT @student_category;
+mysql> SELECT GetMaxEventID(1);
++------------------+
+| GetMaxEventID(1) |
++------------------+
+| Q                |
++------------------+
+1 row in set (0.00 sec)
 */
