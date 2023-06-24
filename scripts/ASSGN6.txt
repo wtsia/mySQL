@@ -1,0 +1,36 @@
+# Got 8/10
+
+create database SALES;
+
+use SALES;
+
+create table Product(Product_ID INT primary key, ProductName VARCHAR(50), ProductDescription VARCHAR(500));
+
+create table Sales(ID INT, QuarterlySales INT, YearlySales INT, Product_ID INT, FOREIGN KEY (Product_ID) REFERENCES Product(Product_ID));
+
+INSERT INTO Product VALUES ('1', 'Onion', 'A vegetable called Onion');
+INSERT INTO Product VALUES ('2', 'Carrot', 'A vegetable called Carrot');
+INSERT INTO Product VALUES ('3', 'Rice', 'A vegetable called Rice');
+INSERT INTO Product VALUES ('4', 'Tomato', 'A vegetable called Tomato');
+INSERT INTO Product VALUES ('5', 'Beet', 'A vegetable called Beet');
+INSERT INTO Product VALUES ('6', 'Radish', 'A vegetable called Radish');
+
+INSERT INTO Sales VALUES ('10', '100', '400', '1');
+INSERT INTO Sales VALUES ('20', '200', '800', '2');
+INSERT INTO Sales VALUES ('30', '300', '1200', '3');
+INSERT INTO Sales VALUES ('40', '400', '1600', '4');
+INSERT INTO Sales VALUES ('50', NULL, NULL, '5');
+INSERT INTO Sales VALUES ('60', NULL, NULL, '6');
+
+# Write a  query where we have sales for every product, compute the quarterly and yearly sales.
+
+SELECT QuarterlySales FROM Sales;
+SELECT SUM(QuarterlySales) AS total_quartery_sales FROM Sales;
+SELECT SUM(YearlySales) AS total_yearly_sales FROM Sales;
+
+# Write a query where there are no sales for a product even though we have product_id available.
+# Demonstrate (Q:9) with both left outer join and right outer join.
+
+SELECT Product.Product_ID FROM Product LEFT OUTER JOIN Sales ON Product.Product_ID = Sales.Product_ID WHERE Sales.QuarterlySales IS NULL;
+
+SELECT Sales.Product_ID FROM Sales RIGHT OUTER JOIN Product ON Product.Product_ID = Sales.Product_ID WHERE Sales.QuarterlySales IS NULL;

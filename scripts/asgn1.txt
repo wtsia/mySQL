@@ -1,0 +1,10 @@
+my personal website detailing installation from a docker image, as well as an ER Diagram. I cannot upload both the website and a file (PDF version of the picture hosted on my website), so I hope the image of the ER diagram is sufficient.
+
+Specific Links:
+1. Install MySQL + Connect to MySQL db.
+
+https://wtsia.github.io/rover/posts/relational-databases/#building-mysql
+
+2. Design and submit an Entity Relationship Diagram
+
+https://wtsia.github.io/rover/posts/relational-databases/#er-diagram-example
