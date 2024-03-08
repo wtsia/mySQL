@@ -1,0 +1,27 @@
+
+a) Look up PCs by speed and RAM
+
+This operation is a read-only query. Atomicity concerns are minimal here because it doesn't alter the database state. A system crash during this operation would not affect database integrity. However, in a broader application context, ensuring that read operations occur within a transaction could be important for consistency and isolation, especially in snapshot isolation levels.
+
+b) Delete a tuple for a given model from both PC and Product
+
+This operation involves deleting data from two tables. If the system crashes after deleting from one table but before deleting from the second, the database would be left in an inconsistent state with orphaned records. To ensure atomicity, the entire operation must be enclosed within a transaction block. Modern DBMS systems use transactions to ensure that such a set of operations either completes fully or rolls back to the previous consistent state if interrupted.
+
+c) Decrease the price of a model PC by $100
+
+This operation updates a row in a single table. The primary atomicity concern is ensuring the update either fully completes or does not happen at all. If a system crash occurs after the update has been partially written to disk, the database might end up with corrupt data. Wrapping this operation in a transaction ensures that the update is atomic. Database systems typically use log files to guarantee that incomplete transactions can be rolled back in the event of a crash.
+
+d) Add a new product and PC model
+
+This operation is the most complex, involving checks against existing data and potentially inserting into two tables. Atomicity is crucial here to avoid duplicate data, ensure data integrity, and maintain referential integrity between tables. If the system crashes after inserting the product but before inserting into the PC table (or vice versa), it could lead to inconsistencies like having a product registered without its corresponding PC details. Encapsulating the entire operation within a transaction ensures that either both inserts are completed successfully, or neither is, maintaining database consistency.
+
+Problems and Solutions
+
+If the system crashes in the middle of these operations without proper transaction management, the atomicity of the operations could be violated, leading to partial updates or inconsistent database states. To mitigate these risks, transactions should be used with BEGIN TRANSACTION, COMMIT, and ROLLBACK statements as appropriate:
+
+- BEGIN TRANSACTION: Marks the start of a transaction.
+- COMMIT: Signals the successful end of a transaction, permanently saving changes.
+- ROLLBACK: Undoes changes made during the transaction, returning to the state at the last BEGIN TRANSACTION.
+
+In the event of a crash, the DBMS's transaction log is used to either complete transactions that were in progress at the time of the crash (if a commit was issued) or roll them back (if the transaction was not completed), thus preserving atomicity.
+

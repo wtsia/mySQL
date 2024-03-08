@@ -65,41 +65,33 @@ INSERT INTO PC (model, speed, ram, hd, price) VALUES
 
 
 -- a) Given a speed and amount of RAM (as arguments of the function), look up the PCs with that speed and RAM, printing the model number and price of each.
+-- The transaction is read-only
 BEGIN TRANSACTION;
-SELECT PC.model, PC.price
+SELECT model, price
 FROM PC
-WHERE PC.speed = <speed_value> AND PC.ram = <ram_value>;
+WHERE speed = ? AND ram = ?;
 COMMIT;
 
 -- b) Given a model number, delete the tuple for that model from both PC and Product.
 BEGIN TRANSACTION;
-DELETE FROM PC WHERE model = <model_number>;
-DELETE FROM Product WHERE model = <model_number>;
+DELETE FROM PC WHERE model = ?;
+DELETE FROM Product WHERE model = ?;
 COMMIT;
 
 -- c) Given a model number, decrease the price of that model PC by $100.
 BEGIN TRANSACTION;
 UPDATE PC
 SET price = price - 100
-WHERE model = <model_number>;
+WHERE model = ?;
 COMMIT;
 
 -- d) Given a maker, model number, processor speed, RAM size, hard-disk size, and price, check that there is no product with that model. If there is such a model, print an error message for the user. If no such model existed in the database, enter the information about that model into the PC and Product tables.
 BEGIN TRANSACTION;
-DECLARE @count INT;
-SET @count = (SELECT COUNT(*) FROM Product WHERE model = <model_number>);
-
-IF @count > 0 THEN
-    -- Model already exists
-    SELECT 'Error: Model already exists' AS Message;
+IF EXISTS (SELECT 1 FROM Product WHERE model = ?) THEN
+    PRINT 'Error: A product with this model already exists.';
 ELSE
-    -- Model doesn't exist, insert into PC and Product tables
-    INSERT INTO PC (model, speed, ram, hd, price)
-    VALUES (<model_number>, <processor_speed>, <ram_size>, <hard_disk_size>, <price>);
-    
-    INSERT INTO Product (maker, model, type)
-    VALUES (<maker>, <model_number>, 'PC');
-    
-    SELECT 'Model inserted successfully' AS Message;
+    INSERT INTO Product (maker, model, type) VALUES (?, ?, 'pc');  
+    INSERT INTO PC (model, speed, ram, hd, price) VALUES (?, ?, ?, ?, ?);
 END IF;
 COMMIT;
+
