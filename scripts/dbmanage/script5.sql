@@ -66,32 +66,33 @@ INSERT INTO PC (model, speed, ram, hd, price) VALUES
 
 -- a) Given a speed and amount of RAM (as arguments of the function), look up the PCs with that speed and RAM, printing the model number and price of each.
 -- The transaction is read-only
-BEGIN TRANSACTION;
+START TRANSACTION;
 SELECT model, price
 FROM PC
-WHERE speed = ? AND ram = ?;
+WHERE speed = 2.8 AND ram = 1024;
 COMMIT;
 
 -- b) Given a model number, delete the tuple for that model from both PC and Product.
-BEGIN TRANSACTION;
-DELETE FROM PC WHERE model = ?;
-DELETE FROM Product WHERE model = ?;
+START TRANSACTION;
+DELETE FROM PC WHERE model = 1001;
+DELETE FROM Product WHERE model = 1001;
 COMMIT;
 
 -- c) Given a model number, decrease the price of that model PC by $100.
-BEGIN TRANSACTION;
+START TRANSACTION;
 UPDATE PC
 SET price = price - 100
-WHERE model = ?;
+WHERE model = 1002;
 COMMIT;
 
 -- d) Given a maker, model number, processor speed, RAM size, hard-disk size, and price, check that there is no product with that model. If there is such a model, print an error message for the user. If no such model existed in the database, enter the information about that model into the PC and Product tables.
-BEGIN TRANSACTION;
-IF EXISTS (SELECT 1 FROM Product WHERE model = ?) THEN
-    PRINT 'Error: A product with this model already exists.';
-ELSE
-    INSERT INTO Product (maker, model, type) VALUES (?, ?, 'pc');  
-    INSERT INTO PC (model, speed, ram, hd, price) VALUES (?, ?, ?, ?, ?);
-END IF;
+SELECT COUNT(*) FROM Product WHERE model = 1001;
+
+START TRANSACTION;
+
+INSERT INTO Product (maker, model, type) VALUES ('Z', 1001, 'pc');
+INSERT INTO PC (model, speed, ram, hd, price) VALUES (1001, 9, 9, 9, 9);
+
 COMMIT;
+
 
