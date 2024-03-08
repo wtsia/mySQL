@@ -66,33 +66,76 @@ INSERT INTO PC (model, speed, ram, hd, price) VALUES
 
 -- a) Given a speed and amount of RAM (as arguments of the function), look up the PCs with that speed and RAM, printing the model number and price of each.
 -- The transaction is read-only
-START TRANSACTION;
-SELECT model, price
-FROM PC
-WHERE speed = 2.8 AND ram = 1024;
-COMMIT;
+DELIMITER $$
+
+CREATE PROCEDURE `LookupPCsBySpeedAndRAM`(IN `p_speed` DECIMAL, IN `p_ram` INT)
+BEGIN
+    SELECT model, price
+    FROM PC
+    WHERE speed = p_speed AND ram = p_ram;
+END$$
+
+DELIMITER ;
+
 
 -- b) Given a model number, delete the tuple for that model from both PC and Product.
-START TRANSACTION;
-DELETE FROM PC WHERE model = 1001;
-DELETE FROM Product WHERE model = 1001;
-COMMIT;
+DELIMITER $$
+
+CREATE PROCEDURE `DeleteModel`(IN `p_model` INT)
+BEGIN
+    START TRANSACTION;
+    
+    DELETE FROM PC WHERE model = p_model;
+    DELETE FROM Product WHERE model = p_model;
+    
+    COMMIT;
+END$$
+
+DELIMITER ;
+
 
 -- c) Given a model number, decrease the price of that model PC by $100.
-START TRANSACTION;
-UPDATE PC
-SET price = price - 100
-WHERE model = 1002;
-COMMIT;
+DELIMITER $$
+
+CREATE PROCEDURE `DecreasePrice`(IN `p_model` INT)
+BEGIN
+    START TRANSACTION;
+    
+    UPDATE PC
+    SET price = price - 100
+    WHERE model = p_model;
+    
+    COMMIT;
+END$$
+
+DELIMITER ;
+
 
 -- d) Given a maker, model number, processor speed, RAM size, hard-disk size, and price, check that there is no product with that model. If there is such a model, print an error message for the user. If no such model existed in the database, enter the information about that model into the PC and Product tables.
-SELECT COUNT(*) FROM Product WHERE model = 1001;
+DELIMITER $$
 
-START TRANSACTION;
+CREATE PROCEDURE `AddProductAndPC`(IN `p_maker` CHAR(1), IN `p_model` INT, IN `p_type` VARCHAR(7), IN `p_speed` DECIMAL, IN `p_ram` INT, IN `p_hd` INT, IN `p_price` INT)
+BEGIN
+    DECLARE model_count INT;
 
-INSERT INTO Product (maker, model, type) VALUES ('Z', 1001, 'pc');
-INSERT INTO PC (model, speed, ram, hd, price) VALUES (1001, 9, 9, 9, 9);
+    SELECT COUNT(*)
+    INTO model_count
+    FROM Product
+    WHERE model = p_model;
+    
+    IF model_count = 0 THEN
+        START TRANSACTION;
+        
+        INSERT INTO Product (maker, model, type) VALUES (p_maker, p_model, p_type);
+        INSERT INTO PC (model, speed, ram, hd, price) VALUES (p_model, p_speed, p_ram, p_hd, p_price);
+        
+        COMMIT;
+    ELSE
+        SELECT 'Error: A product with this model already exists.' AS ErrorMessage;
+    END IF;
+END$$
 
-COMMIT;
+DELIMITER ;
+
 
 
