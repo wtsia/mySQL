@@ -84,11 +84,14 @@ INSERT INTO Ships VALUES ('Yamato', 'Yamato', 1941);
 
 
 -- a) Find the ships heavier than 35,000 tons.
+SELECT 'a.' AS Message;
 SELECT name
-FROM Classes
+FROM Ships
+JOIN Classes ON Classes.class = Ships.class
 WHERE displacement > 35000;
 
 -- b) List the name, displacement, and number of guns of the ships engaged in the battle of Guadalcanal.
+SELECT 'b.' AS Message;
 SELECT S.name, C.displacement, C.numGuns
 FROM Ships S
 JOIN Classes C ON S.class = C.class
@@ -97,12 +100,14 @@ JOIN Battles B ON O.battle = B.name
 WHERE B.name = 'Guadalcanal';
 
 -- c) List all the ships mentioned in the database. (Remember that all these ships may not appear in the Ships relation.)
+SELECT 'c.' AS Message;
 SELECT name FROM Ships
 UNION
 SELECT ship FROM Outcomes;
 
 
 -- d) Find the names of the ships with a 16-inch bore using subquery with `IN`:
+SELECT 'd.' AS Message;
 SELECT name
 FROM Ships
 WHERE class IN (SELECT class FROM Classes WHERE bore = 16.0);
@@ -114,24 +119,26 @@ FROM Ships S
 WHERE EXISTS (SELECT 1 FROM Classes C WHERE C.class = S.class AND C.bore = 16.0);
 
 
--- e) Find the battles in which ships of the Kongo class participated using subquery with `IN`:
+-- e) Find the battles in which ships of the Kongo class participated using subquery `IN`:
+SELECT 'e.' AS Message;
 SELECT DISTINCT B.name
 FROM Battles B
 WHERE B.name IN (SELECT O.battle FROM Outcomes O JOIN Ships S ON O.ship = S.name WHERE S.class = 'Kongo');
 
 
--- Using `EXISTS`:
+-- `EXISTS`:
 SELECT DISTINCT B.name
 FROM Battles B
 WHERE EXISTS (SELECT 1 FROM Outcomes O JOIN Ships S ON O.ship = S.name WHERE O.battle = B.name AND S.class = 'Kongo');
 
 
 -- f) Find the countries whose ships had the largest number of guns using subquery with `ALL`:
+SELECT 'f.' AS Message;
 SELECT DISTINCT country
 FROM Classes C
 WHERE C.numGuns >= ALL (SELECT numGuns FROM Classes);
 
--- Using `ANY`:
+-- `ANY`:
 SELECT DISTINCT country
 FROM Classes C
 WHERE C.numGuns >= ANY (SELECT numGuns FROM Classes);
